@@ -13,11 +13,15 @@
         会员登录
       </div>
       <el-form :model="loginForm" label-width="80px" class="login_form" :rules="loginRules" ref="loginRef">
-        <el-form-item label="用户名" prop="userName">
-          <el-input  prefix-icon="el-icon-user" v-model="loginForm.userName"></el-input>
+        <el-form-item label="电话" prop="Telephone">
+          <el-input  prefix-icon="el-icon-phone" v-model="loginForm.Telephone"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input  prefix-icon="el-icon-lock" v-model="loginForm.password" show-password></el-input>
+        <el-form-item label="密码" prop="Password">
+          <el-input  prefix-icon="el-icon-lock" v-model="loginForm.Password" show-password></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-radio v-model="radio" label="会员" >会员</el-radio>
+          <el-radio v-model="radio" label="管理员">管理员</el-radio>
         </el-form-item>
         <el-form-item>
         <el-button type="warning" @click="login">登录</el-button>
@@ -29,21 +33,24 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+import Vue from 'vue'
 export default {
   data () {
     return {
+      radio: '会员',
       // 登录表单的数据绑定
       loginForm: {
-        userName: '',
-        password: ''
+        Telephone: '',
+        Password: ''
       },
       // 登录表单的验证规则
       loginRules: {
-        userName: [
-          { required: true, message: '请输入用户名', trigger: 'blur' },
-          { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+        Telephone: [
+          { required: true, message: '请输入电话号码', trigger: 'blur' },
+          { min: 11, max: 11, message: '电话号码正确长度为 11 个字符', trigger: 'blur' }
         ],
-        password: [
+        Password: [
           { required: true, message: '请输入密码', trigger: 'blur' },
           { min: 6, max: 15, message: '长度在 6 到 15 个字符', trigger: 'blur' }
         ]
@@ -51,17 +58,19 @@ export default {
     }
   },
   methods: {
+    ...mapActions('userModule', { userLogin: 'login' }),
     // 登录按钮
     login () {
       this.$refs.loginRef.validate(async valid => {
         if (!valid) return
-        // const { data: res } = await this.$http.post('login', this.loginForm)
-        // if (res.meta.status !== 200) return this.$message.error('登录失败！')
-        // this.$message.success('登录成功！')
-        // 登录成功后token保存到客户端的seesionStorage
-        // window.sessionStorage.setItem('token', res.data.token)
-        // 导航跳转到后台主页
-        this.$router.push('/home')
+        this.userLogin(this.loginForm).then(() => {
+          if (this.radio === '会员') this.$router.push('/UserHome')
+          else this.$router.push('/ManagementHome')
+          Vue.prototype.$message.success('登录成功！')
+        }).catch((err) => {
+          Vue.prototype.$message.error('登录失败！')
+          console.log(err)
+        })
       })
     },
     // 注册按钮
@@ -99,7 +108,7 @@ export default {
 }
 .login_box{
   width: 450px;
-  height: 300px;
+  height: 380px;
   background-color: #fff;
   border-radius: 5px ;
   position: absolute;

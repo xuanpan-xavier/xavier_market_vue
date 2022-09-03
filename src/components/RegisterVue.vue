@@ -13,14 +13,14 @@
         会员注册
       </div>
       <el-form :model="registerForm" label-width="80px" class="register_form" :rules="registerRules" ref="registerRef">
-        <el-form-item label="用户名" prop="userName">
-          <el-input  prefix-icon="el-icon-user" v-model="registerForm.userName"></el-input>
+        <el-form-item label="用户名" prop="Name">
+          <el-input  prefix-icon="el-icon-user" v-model="registerForm.Name"></el-input>
         </el-form-item>
-        <el-form-item label="电话" prop="userPhone">
-          <el-input  prefix-icon="el-icon-phone" v-model="registerForm.userPhone"></el-input>
+        <el-form-item label="电话" prop="Telephone">
+          <el-input  prefix-icon="el-icon-phone" v-model="registerForm.Telephone"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input  prefix-icon="el-icon-lock" v-model="registerForm.password" show-password></el-input>
+        <el-form-item label="密码" prop="Password">
+          <el-input  prefix-icon="el-icon-lock" v-model="registerForm.Password" show-password></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="warning" @click="register">注册</el-button>
@@ -32,26 +32,28 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+import Vue from 'vue'
 export default {
   data () {
     return {
       // 注册表单的数据绑定
       registerForm: {
-        userName: '',
-        userPhone: '',
-        password: ''
+        Name: '',
+        Telephone: '',
+        Password: ''
       },
       // 登录表单的验证规则
       registerRules: {
-        userName: [
+        Name: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
           { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
         ],
-        userPhone: [
+        Telephone: [
           { required: true, message: '请输入电话号码', trigger: 'blur' },
-          { min: 11, max: 11, message: '长度为 11 个字符', trigger: 'blur' }
+          { min: 11, max: 11, message: '电话号码正确长度为 11 个字符', trigger: 'blur' }
         ],
-        password: [
+        Password: [
           { required: true, message: '请输入密码', trigger: 'blur' },
           { min: 6, max: 15, message: '长度在 6 到 15 个字符', trigger: 'blur' }
         ]
@@ -59,17 +61,30 @@ export default {
     }
   },
   methods: {
+    ...mapActions('userModule', { userRegister: 'register' }),
     // 注册按钮
     register () {
       this.$refs.registerRef.validate(async valid => {
         if (!valid) return
-        // const { data: res } = await this.$http.post('login', this.loginForm)
-        // if (res.meta.status !== 200) return this.$message.error('登录失败！')
-        // this.$message.success('登录成功！')
-        // 登录成功后token保存到客户端的seesionStorage
-        // window.sessionStorage.setItem('token', res.data.token)
-        // 导航跳转到后台主页
-        this.$router.push('/home')
+        this.userRegister(this.registerForm).then(async () => {
+        // userService.register(this.registerForm).then((res) => {
+          // 登录成功后token保存到缓存
+          // storageService.set(storageService.USER_TOKEN, res.data.token)
+          // this.SET_TOKEN(res.data.data.token)
+          // this.$store.commit('userModule/SET_TOKEN', res.data.data.token)
+          // 导航跳转到后台主页
+          // return userService.info()
+          await this.$router.push('/UserHome')
+          Vue.prototype.$message.success('注册成功！')
+        })// .then(async (response) => {
+          // 保存用户信息
+          // this.SET_USERINFO(response.data.data.user)
+          // this.$store.commit('userModule/SET_USERINFO', response.data.data.user)
+          // storageService.set(storageService.USER_INFO, JSON.stringify(response.data.data.user))// 序列化 取出时需要反序列化JSON.parse(
+          .catch((err) => {
+            Vue.prototype.$message.error('注册失败！')
+            console.log(err)
+          })
       })
     },
     // 注册按钮

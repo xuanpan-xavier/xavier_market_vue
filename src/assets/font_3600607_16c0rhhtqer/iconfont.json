@@ -1,0 +1,16 @@
+{
+  "id": "3600607",
+  "name": "数据库",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "11488209",
+      "name": "vip",
+      "font_class": "vip",
+      "unicode": "e773",
+      "unicode_decimal": 59251
+    }
+  ]
+}
